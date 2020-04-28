@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery.post demo</title>
+  <script src="jquery-3.5.0.js"></script>
+</head>
+<body>
+ 
+<form id="searchForm">
+  <input type="number" name="userId" placeholder="User ID">
+  <input type="text" name="title" placeholder="Movie Title">
+  <input type="submit" value="Recommend">
+</form>
+<!-- the result of the search will be rendered inside this div -->
+<div id="result"></div>
+ 
+<script>
+// Attach a submit handler to the form
+$( "#searchForm" ).submit(function( event ) {
+ 
+  // Stop form from submitting normally
+  event.preventDefault();
+ 
+  // Get some values from elements on the page:
+  var $form = $( this ),
+    userId = $form.find( "input[name='userId']" ).val(),
+	title = $form.find( "input[name='title']" ).val(),
+    url = $form.attr( "action" );
+	jsonRequest = {
+					"userId" : userId,
+					"title" : title
+				};
+  // Send the data using post
+  var posting = $.ajax({
+            type: "POST",
+            url:"http://127.0.0.1:5000/",
+			headers: { 'Access-Control-Allow-Origin': '*' },
+            async: false,
+            data: JSON.stringify(jsonRequest) ,
+            contentType: "application/json",
+            complete: function (data) {
+            var content = $( data ).find( "#content" );
+			$( "#result" ).empty().append( content );
+        }
+    });
+ 
+  // Put the results in a div
+  
+});
+</script>
+ 
+</body>
+</html>
