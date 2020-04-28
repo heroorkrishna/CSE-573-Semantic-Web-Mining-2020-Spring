@@ -3,6 +3,7 @@
 
 1. The submission has 3 sub-directories CODE, DATA and Evaluations
 2. The CODE has 2 more sub-directories:
+
     a. notebook : Contains Jupyter Notebook for the implemented models
                   1. rbm_based_recommender.ipynb : Contains code for Content Based Recommender as well as Restricted Boltzmann machine      based Collabrative filtering. It also contains code for Hybrid Recommender
                   2. sgd.ipynb : Contains code for Matrix Factorizaion using Stochastic Gradient Descent Recommmender
