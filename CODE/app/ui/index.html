@@ -2,53 +2,207 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>jQuery.post demo</title>
-  <script src="jquery-3.5.0.js"></script>
+  <title>Group 14 Movie Recommendation</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
- 
-<form id="searchForm">
-  <input type="number" name="userId" placeholder="User ID">
-  <input type="text" name="title" placeholder="Movie Title">
-  <input type="submit" value="Recommend">
-</form>
-<!-- the result of the search will be rendered inside this div -->
-<div id="result"></div>
- 
-<script>
-// Attach a submit handler to the form
-$( "#searchForm" ).submit(function( event ) {
- 
-  // Stop form from submitting normally
-  event.preventDefault();
- 
-  // Get some values from elements on the page:
-  var $form = $( this ),
-    userId = $form.find( "input[name='userId']" ).val(),
-	title = $form.find( "input[name='title']" ).val(),
-    url = $form.attr( "action" );
-	jsonRequest = {
-					"userId" : userId,
-					"title" : title
-				};
-  // Send the data using post
-  var posting = $.ajax({
-            type: "POST",
-            url:"http://127.0.0.1:5000/",
-			headers: { 'Access-Control-Allow-Origin': '*' },
-            async: false,
-            data: JSON.stringify(jsonRequest) ,
-            contentType: "application/json",
-            complete: function (data) {
-            var content = $( data ).find( "#content" );
-			$( "#result" ).empty().append( content );
-        }
-    });
- 
-  // Put the results in a div
+
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#home">Content Based Filtering</a></li>
+  <li><a data-toggle="tab" href="#menua">Item Based Collabrative Filtering </a></li>
+  <li><a data-toggle="tab" href="#menu1">Restricted Boltzman Machine(RBM)</a></li>
+  <li><a data-toggle="tab" href="#menu2">Matrix Factorization (SGD)</a></li>
+  <li><a data-toggle="tab" href="#menu3">User Based Collabrative Filtering</a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    
+    <div class="container">
+		<div class="form-group">
+			<label>Title:</label><br><br>
+			<input type="text" id="titleContentBased" placeholder = "Please Enter Movie Title" class="form-control">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" onclick="getContentRecommendations()">Recommend</button>
+		</div>
+		<div id="resultContentBased"></div> 
+	</div>
+  </div>
+  <div id="menua" class="tab-pane fade">
+    
+    <div class="container">
+		<div class="form-group">
+			<label>Title:</label><br><br>
+			<input type="text" id="titleII" placeholder = "Please Enter Movie Title" class="form-control">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" onclick="getIIRecommendations()">Recommend</button>
+		</div>
+		<div id="resultII"></div> 
+	</div>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <div class="container">
+		<div class="form-group">
+			 <label>User ID:</label><br><br>
+			 <input type="number" id="userIdRBM" name="userIdRBM" placeholder = "Please Enter User ID" class="form-control">
+		</div>
+		<div  class="form-group">
+			<label>Title:</label><br><br>
+			<input type="text" id="titleRBM" name="titleRBM" placeholder = "Please Enter Movie Title" class="form-control">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" onclick="getRBMRecommendations()">Recommend</button>
+		</div>
+		<div id="resultRBM"></div> 
+	</div>
+  </div>
+  <div id="menu2" class="tab-pane fade">
+    <div class="container">
+		<div class="form-group">
+			 <label>User ID:</label><br><br>
+			 <input type="number" id="userIdSVD" placeholder = "Please Enter User ID" class="form-control">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" onclick="getSVDRecommendations()">Recommend</button>
+		</div>
+		<div id="resultSVD"></div> 
+	</div>
+  </div>
   
-});
+  <div id="menu3" class="tab-pane fade">
+    <div class="container">
+		<div class="form-group">
+			 <label>User ID:</label><br><br>
+			 <input type="number" id="userIdUI" placeholder = "Please Enter User ID" class="form-control">
+		</div>
+		<div class="form-group">
+			<button type="button" class="btn btn-primary" onclick="getUIRecommendations()">Recommend</button>
+		</div>
+		<div id="resultUI"></div> 
+	</div>
+  </div>
+  
+</div>
+
+
+	
+<script>
+	getRBMRecommendations = function() {
+    
+    var userId = document.getElementById("userIdRBM"); 
+    var title = document.getElementById("titleRBM");  
+	
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://127.0.0.1:5000/rbm', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+				// do something to response
+				//result.innerHTML=this.responseText;
+				myObj = JSON.parse(this.responseText)
+				var txt="";
+				txt += "<table border='1' class='table table-striped'><thead><tr><th>Movie Titles</th></tr></thead>"
+				for (i in myObj) {
+				  txt += "<tr><td>" + myObj[i] + "</td></tr>";
+				}
+				txt += "</table>"
+				document.getElementById("resultRBM").innerHTML = txt;
+				
+			};
+			xhr.send('userId='+userId.value+'&title='+title.value);
+	};
+	
+	getSVDRecommendations = function() {
+    
+    var userId = document.getElementById("userIdSVD"); 
+	
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://127.0.0.1:5000/svd', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+				myObj = JSON.parse(this.responseText)
+				var txt="";
+				txt += "<table border='1' class='table table-striped'><thead><tr><th>Movie Titles</th></tr></thead>"
+				for (i in myObj) {
+				  txt += "<tr><td>" + myObj[i] + "</td></tr>";
+				}
+				txt += "</table>"
+				document.getElementById("resultSVD").innerHTML = txt;
+				
+			};
+			xhr.send('userId='+userId.value);
+	};
+	
+	getUIRecommendations = function() {
+    
+    var userId = document.getElementById("userIdUI"); 
+	
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://127.0.0.1:5000/user-based', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+				myObj = JSON.parse(this.responseText)
+				var txt="";
+				txt += "<table border='1' class='table table-striped'><thead><tr><th>Movie Titles</th></tr></thead>"
+				for (i in myObj) {
+				  txt += "<tr><td>" + myObj[i] + "</td></tr>";
+				}
+				txt += "</table>"
+				document.getElementById("resultUI").innerHTML = txt;
+				
+			};
+			xhr.send('userId='+userId.value);
+	};
+	getIIRecommendations = function() {
+    
+    var title = document.getElementById("titleII"); 
+	
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://127.0.0.1:5000/item-item', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+				myObj = JSON.parse(this.responseText)
+				var txt="";
+				txt += "<table border='1' class='table table-striped'><thead><tr><th>Movie Titles</th></tr></thead>"
+				for (i in myObj) {
+				  txt += "<tr><td>" + myObj[i] + "</td></tr>";
+				}
+				txt += "</table>"
+				document.getElementById("resultII").innerHTML = txt;
+				
+			};
+			xhr.send('title='+title.value);
+	};
+	
+	getContentRecommendations = function() {
+    
+    var title = document.getElementById("titleContentBased"); 
+	
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://127.0.0.1:5000/content-based', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+				myObj = JSON.parse(this.responseText)
+				var txt="";
+				txt += "<table border='1' class='table table-striped'><thead><tr><th>Movie Titles</th></tr></thead>"
+				for (i in myObj) {
+				  txt += "<tr><td>" + myObj[i] + "</td></tr>";
+				}
+				txt += "</table>"
+				document.getElementById("resultContentBased").innerHTML = txt;
+				
+			};
+			xhr.send('title='+title.value);
+	}
+	
 </script>
- 
 </body>
 </html>
